@@ -4,7 +4,6 @@
   "license": "MIT",
   "scripts": {},
   "private": true,
-  "type": "module",
   "dependencies": {
     "@monodon/rust": "2.0.0-beta.1",
     "react": "18.3.1",
