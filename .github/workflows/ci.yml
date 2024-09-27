@@ -45,7 +45,7 @@ jobs:
           echo "HEAD: ${{ env.NX_HEAD }}"
 
       - name: Running Rust Application and Library Targets
-        run: pnpm exec nx affected -t build test --no-cloud --exclude='tag:rust-app' --configuration=production
+        run: pnpm exec nx affected -t build test --no-cloud --exclude='tag:react-app' --configuration=production
 
       # Prepend any command with "nx-cloud record --" to record its logs to Nx Cloud
       # - run: pnpm exec nx-cloud record -- echo Hello World
