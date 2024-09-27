@@ -14,7 +14,8 @@ jobs:
   main:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Fetching repository
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
       
@@ -28,6 +29,11 @@ jobs:
       # TODO: debug the lock-file not found issue
       # - run: pnpm dlx nx-cloud start-ci-run --distribute-on="3 linux-medium-js" --stop-agents-after="e2e-ci"
       
+      # Cache ~/.cache
+      - uses: actions/cache@v4
+        with:
+          path: ~/.cache
+
       
       # Cache node_modules
       - uses: actions/setup-node@v4
