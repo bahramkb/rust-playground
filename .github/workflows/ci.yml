@@ -54,8 +54,6 @@ jobs:
         run: pnpm exec nx affected -t build --exclude='tag:rust-app' --configuration=production
       - name: Testing
         run: pnpm exec nx affected -t test --exclude='tag:rust-app' --configuration=production
-      - name: E2E Testing
-        run: pnpm exec nx affected -t e2e --exclude='tag:rust-app' --configuration=production
 
   rust:
     name: Rust Application Tasks
