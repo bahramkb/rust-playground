@@ -11,7 +11,7 @@ export default defineConfig({
         default: 'pnpm exec nx run react-monorepo:serve',
         production: 'pnpm exec nx run react-monorepo:preview',
       },
-      ciWebServerCommand: 'pnpm exec nx run react-monorepo:preview',
+      ciWebServerCommand: 'pnpm exec nx run react-monorepo:serve-static',
       ciBaseUrl: 'http://localhost:4300',
     }),
     baseUrl: 'http://localhost:4200',
