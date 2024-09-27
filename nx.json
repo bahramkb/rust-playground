@@ -81,5 +81,6 @@
       }
     }
   },
-  "useInferencePlugins": true
+  "useInferencePlugins": true,
+  "neverConnectToCloud": true
 }
