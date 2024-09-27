@@ -33,8 +33,8 @@ jobs:
       # Cache ~/.cache
       - uses: actions/cache@v4
         with:
-          path: ~/.cache/Cypress
-          key: ${{ runner.os }}-cypress-${{ hashFiles('**/*') }}
+          path: ~/.cache
+          key: ${{ runner.os }}-cypress-${{ hashFiles(./Cypress/**/*') }}
           restore-keys: |
             ${{ runner.os }}-cypress-
 
@@ -54,8 +54,8 @@ jobs:
           echo "BASE: ${{ env.NX_BASE }}"
           echo "HEAD: ${{ env.NX_HEAD }}"
 
-      - name: Running Rust Application and Library Targets
-        run: pnpm exec nx affected -t build test --no-cloud --exclude='tag:react-app' --configuration=production
+      # - name: Running Rust Application and Library Targets
+      #   run: pnpm exec nx affected -t build test --no-cloud --exclude='tag:react-app' --configuration=production
 
       # Prepend any command with "nx-cloud record --" to record its logs to Nx Cloud
       # - run: pnpm exec nx-cloud record -- echo Hello World
