@@ -46,5 +46,5 @@ jobs:
       # Prepend any command with "nx-cloud record --" to record its logs to Nx Cloud
       # - run: pnpm exec nx-cloud record -- echo Hello World
       # Nx Affected runs only tasks affected by the changes in this PR/commit. Learn more: https://nx.dev/ci/features/affected
-      - name: Run Application and Library Targets
-        run: pnpm exec nx affected -t lint build test e2e-ci --configuration=production
+      - name: Running Nodejs Application and Library Targets
+        run: pnpm exec nx affected -t lint build test e2e-ci --exclude='tag:rust-app' --configuration=production
