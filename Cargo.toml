@@ -4,6 +4,7 @@ resolver = '2'
 members = [
 	'apps/myapp',
 	'libs/cats',
+	'libs/task_runner',
 ]
 
 [profile.release]

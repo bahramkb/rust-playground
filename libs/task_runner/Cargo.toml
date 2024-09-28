@@ -1,0 +1,12 @@
+[package]
+name = "task_runner"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+tokio = { version = "1.4" , features = ["full"] }
+uuid = { version = "1", features = ["v4"] }
+chrono = "0.4.38"
+trait-variant = "0.1.2"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
