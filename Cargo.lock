@@ -218,7 +218,8 @@ dependencies = [
 name = "myapp"
 version = "0.1.0"
 dependencies = [
- "cats",
+ "task_runner",
+ "tokio",
 ]
 
 [[package]]

@@ -1,19 +1,14 @@
+use crate::executors::executor_trait::ExecutorTrait;
+use crate::executors::noop_executor::NoopExecutor;
+use crate::executors::{docker_executor::DockerExecutor, local_executor::LocalExecutor};
 use chrono::{DateTime, Utc};
-use std::{
-    fs::File,
-    io::Error,
-    io::Write,
-    marker::PhantomData,
-    process::{Command, Output},
-};
+use std::{marker::PhantomData, process::Output};
 use uuid::Uuid;
 
-use super::local_executor::ExecutorTrait;
-
-struct EmptyTask;
-struct ReadyTask;
-struct FailedTask;
-struct SuccessfulTask;
+pub struct EmptyTask;
+pub struct ReadyTask;
+pub struct FailedTask;
+pub struct SuccessfulTask;
 
 #[derive(Debug, Clone, Copy)]
 pub enum CodeLanguage {
@@ -23,7 +18,7 @@ pub enum CodeLanguage {
     Python,
 }
 
-struct Task<S = EmptyTask> {
+pub struct Task<S = EmptyTask> {
     id: Uuid,
     name: String,
     code_language: CodeLanguage,
@@ -33,6 +28,17 @@ struct Task<S = EmptyTask> {
     started_at: Option<DateTime<Utc>>,
     finished_at: Option<DateTime<Utc>>,
     state: PhantomData<S>,
+}
+
+async fn is_docker_installed() -> bool {
+    std::process::Command::new("docker")
+        .arg("--version")
+        .output()
+        .is_ok()
+}
+
+async fn is_running_in_github_actions() -> bool {
+    std::env::var("GITHUB_ACTIONS").is_ok()
 }
 
 impl Task {
@@ -74,15 +80,29 @@ impl Task<EmptyTask> {
 }
 
 impl Task<ReadyTask> {
-    pub async fn execute(
-        &mut self,
-        executor: impl ExecutorTrait,
-    ) -> Result<Task<SuccessfulTask>, Task<FailedTask>> {
+    pub async fn execute(&mut self) -> Result<Task<SuccessfulTask>, Task<FailedTask>> {
         self.started_at = Some(Utc::now());
-
         self.tries += 1;
 
-        self.output = Some(executor.run(self.code.clone(), self.code_language).await);
+        self.output = match is_docker_installed().await {
+            true => Some(
+                DockerExecutor::new()
+                    .run(self.code.clone(), self.code_language)
+                    .await,
+            ),
+            false => match is_running_in_github_actions().await {
+                true => Some(
+                    LocalExecutor::new()
+                        .run(self.code.clone(), self.code_language)
+                        .await,
+                ),
+                false => Some(
+                    NoopExecutor::new()
+                        .run(self.code.clone(), self.code_language)
+                        .await,
+                ),
+            },
+        };
 
         self.finished_at = Some(Utc::now());
 
@@ -154,7 +174,7 @@ impl Task<SuccessfulTask> {
 
 #[cfg(test)]
 mod tests {
-    use crate::local::{local_executor::LocalExecutor, task::CodeLanguage};
+    use crate::task::CodeLanguage;
 
     use super::Task;
 
@@ -166,8 +186,7 @@ mod tests {
             CodeLanguage::Node,
             "console.log(`this is javascript: ${2 + 2}`)".to_string(),
         );
-        let executor = LocalExecutor::new();
-        let output = task.execute(executor).await;
+        let output = task.execute().await;
 
         assert!(output.is_ok());
 
@@ -194,7 +213,7 @@ mod tests {
             CodeLanguage::Python,
             "print('this is python: {}'.format(2 + 2))".to_string(),
         );
-        let output = task.execute(LocalExecutor {}).await;
+        let output = task.execute().await;
 
         assert!(output.is_ok());
 
@@ -225,7 +244,7 @@ mod tests {
                 "#
             .to_string(),
         );
-        let output = task.execute(LocalExecutor {}).await;
+        let output = task.execute().await;
 
         assert!(output.is_ok());
 

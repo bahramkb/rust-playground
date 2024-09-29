@@ -1,13 +1,9 @@
 use std::process::Output;
 
-use super::task::CodeLanguage;
+use crate::executors::executor_trait::ExecutorTrait;
+use crate::task::CodeLanguage;
 
 pub struct LocalExecutor {}
-
-#[trait_variant::make(ExecutorTrait: Send)]
-pub trait LocalExecutorTrait {
-    async fn run(&self, code: String, language: CodeLanguage) -> Output;
-}
 
 impl LocalExecutor {
     pub fn new() -> Self {
@@ -42,8 +38,9 @@ impl ExecutorTrait for LocalExecutor {
 
 #[cfg(test)]
 mod tests {
-    use crate::local::local_executor::{LocalExecutor, LocalExecutorTrait};
-    use crate::local::task::CodeLanguage;
+    use crate::executors::executor_trait::ExecutorTrait;
+    use crate::executors::local_executor::LocalExecutor;
+    use crate::task::CodeLanguage;
 
     #[tokio::test]
     async fn test_execute_shell() {

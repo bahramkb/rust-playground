@@ -1,10 +1,10 @@
-use std::fs::File;
-use std::io::{self, Write};
+use std::io::Write;
 use std::process::Output;
 
 use uuid::Uuid;
 
-use super::{local_executor::ExecutorTrait, task::CodeLanguage};
+use crate::executors::executor_trait::ExecutorTrait;
+use crate::task::CodeLanguage;
 
 pub struct DockerExecutor {}
 
@@ -80,9 +80,9 @@ impl ExecutorTrait for DockerExecutor {
 
 #[cfg(test)]
 mod tests {
-    use crate::local::{
-        docker_executor::DockerExecutor, local_executor::ExecutorTrait, task::CodeLanguage,
-    };
+    use crate::executors::docker_executor::DockerExecutor;
+    use crate::executors::executor_trait::ExecutorTrait;
+    use crate::task::CodeLanguage;
 
     #[tokio::test]
     #[ignore]
