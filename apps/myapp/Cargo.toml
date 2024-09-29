@@ -5,6 +5,7 @@ edition = "2021"
 
 
 [dependencies]
-cats = { path = "../../libs/cats" }
+task_runner = { path = "../../libs/task_runner" }
+tokio = { version = "1.4" , features = ["full"] }
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
