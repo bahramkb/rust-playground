@@ -1,6 +1,7 @@
 use crate::executors::executor_trait::ExecutorTrait;
 use crate::executors::noop_executor::NoopExecutor;
 use crate::executors::{docker_executor::DockerExecutor, local_executor::LocalExecutor};
+use crate::utils::{is_docker_running, is_docker_installed, is_running_in_github_actions};
 use chrono::{DateTime, Utc};
 use std::{marker::PhantomData, process::Output};
 use uuid::Uuid;
@@ -30,20 +31,9 @@ pub struct Task<S = EmptyTask> {
     state: PhantomData<S>,
 }
 
-async fn is_docker_installed() -> bool {
-    std::process::Command::new("docker")
-        .arg("--version")
-        .output()
-        .is_ok()
-}
-
-async fn is_running_in_github_actions() -> bool {
-    std::env::var("GITHUB_ACTIONS").is_ok()
-}
-
 impl Task {
     pub fn new(name: String) -> Task<EmptyTask> {
-        return Task {
+        Task {
             id: Uuid::new_v4(),
             name,
             code_language: CodeLanguage::None,
@@ -53,7 +43,7 @@ impl Task {
             started_at: None,
             finished_at: None,
             state: Default::default(),
-        };
+        }
     }
 }
 
@@ -84,7 +74,7 @@ impl Task<ReadyTask> {
         self.started_at = Some(Utc::now());
         self.tries += 1;
 
-        self.output = match is_docker_installed().await {
+        self.output = match is_docker_installed().await && is_docker_running().await {
             true => Some(
                 DockerExecutor::new()
                     .run(self.code.clone(), self.code_language)
@@ -92,12 +82,12 @@ impl Task<ReadyTask> {
             ),
             false => match is_running_in_github_actions().await {
                 true => Some(
-                    LocalExecutor::new()
+                    NoopExecutor::new()
                         .run(self.code.clone(), self.code_language)
                         .await,
                 ),
                 false => Some(
-                    NoopExecutor::new()
+                    LocalExecutor::new()
                         .run(self.code.clone(), self.code_language)
                         .await,
                 ),
